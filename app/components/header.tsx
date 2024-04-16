@@ -1,5 +1,5 @@
 import { LaptopIcon, MoonIcon, SunIcon } from "@radix-ui/react-icons";
-import { Link } from "@remix-run/react";
+import { Link, useLoaderData } from "@remix-run/react";
 import * as React from "react";
 import { useHydrated } from "remix-utils/use-hydrated";
 
@@ -17,6 +17,47 @@ import {
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
+import { json, LoaderFunctionArgs } from "@remix-run/node";
+import SteamProfileBanner from "./steam-profile-banner";
+
+export type Player = {
+	steamid: string;
+	communityvisibilitystate: number;
+	profilestate: number;
+	personaname: string;
+	profileurl: string;
+	avatar: string;
+	avatarmedium: string;
+	avatarfull: string;
+	avatarhash: string;
+	personastate: string;
+	realname: string;
+	primaryclanid: string;
+	timecreated: number;
+	personastateflags: number;
+	loccountrycode: string;
+	locstatecode: string;
+	loccityid: number;
+};
+
+export async function loader({ params, request }: LoaderFunctionArgs) {
+	const steamId = params.steamId;
+	const steamKey = process.env.STEAM_KEY;
+	const url = `http://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002/?key=${steamKey}&steamids=${steamId}`;
+	const res = await fetch(url);
+	const {
+		response: { players },
+	} = await res.json();
+	return json(
+		players.first() || {
+			avatarmedium:
+				"https://th.bing.com/th?id=OSK.2aeea85494562513165ee6986eceda50&w=102&h=102&c=7&o=6&oif=webp&pid=SANGAM",
+			personaname: "Please login",
+			personastate: "You must",
+		},
+	);
+}
+
 export function Header() {
 	const hydrated = useHydrated();
 	const [, rerender] = React.useState({});
@@ -26,12 +67,18 @@ export function Header() {
 	}, []);
 	const theme = getTheme();
 
+	const steamPlayer: Player = useLoaderData<typeof loader>();
+
 	return (
 		<header className="flex items-center justify-between px-4 py-2 md:py-4">
 			<div className="flex items-center space-x-4">
 				<Link className="flex items-center space-x-2" to="/">
 					{/* <HomeIcon className="h-6 w-6" /> */}
-					<span className="text-lg font-bold">shadcn</span>
+					<SteamProfileBanner
+						image={steamPlayer?.avatarmedium}
+						username={steamPlayer?.personaname}
+						description={steamPlayer?.personastate}
+					/>
 				</Link>
 			</div>
 			<DropdownMenu>
