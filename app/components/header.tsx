@@ -43,7 +43,7 @@ export type Player = {
 export async function loader({ params, request }: LoaderFunctionArgs) {
 	const steamId = params.steamId;
 	const steamKey = process.env.STEAM_KEY;
-	const url = `http://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002/?key=${steamKey}&steamids=${steamId}`;
+	const url = `https://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002/?key=${steamKey}&steamids=${steamId}`;
 	const res = await fetch(url);
 	const {
 		response: { players },

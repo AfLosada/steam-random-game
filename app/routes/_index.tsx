@@ -19,13 +19,13 @@ const buildOnSubmitCallback = (steamKey: string) => {
 	return async (username: string) => {
 		let steamId = null;
 		const response = await fetch(
-			`http://api.steampowered.com/ISteamUser/ResolveVanityURL/v0001/?key=${steamKey}&vanityurl=${username}`,
+			`https://api.steampowered.com/ISteamUser/ResolveVanityURL/v0001/?key=${steamKey}&vanityurl=${username}`,
 		);
 		const {
 			response: { steamid },
 		} = await response.json();
 		if (steamid) {
-			const url = `http://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002/?key=${steamKey}&steamids=${steamid}`;
+			const url = `https://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002/?key=${steamKey}&steamids=${steamid}`;
 			const checkIfSteamIdResponse = await fetch(url);
 			const {
 				response: {
